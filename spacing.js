@@ -7,7 +7,7 @@
 		caps();
 	}
 	function pToUl() {
-		$('p').each(function() {$(this).html( $(this).html().replace(/[^.]+\./,"$& <ul class=\"indent\"><li>").replace(/\. /g, '.</li><li>')+'</li></ul>' )})
+		$('p').each(function() {$(this).html( $(this).html().replace(/[^.]+\./,"$& <ul class=\"spacing-indent\"><li>").replace(/\. /g, '.</li><li>')+'</li></ul>' )})
 	}
 	function caps() {
 		$('p').each(function() {
@@ -23,7 +23,10 @@
 	/* Script loading & running */
 	//---------------------------------------------
 	function withJquery($) {
-		spacing();
+		if(!$('body').data('spacing')) {
+			$('body').data('spacing', true);
+			spacing();
+		}
 	}
 
 	function loadJquery(callback) {
