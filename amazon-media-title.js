@@ -1,5 +1,6 @@
-// Extract media details from Amazon (US & international). Load jQuery if not present
+// Extract media details from Amazon (US & international).
 // File name: amazon-media-title.js
+// Keyboard Shortcut: alt-b
 // 28aug2014: disable weight
 //
 // BUGS:

@@ -1,5 +1,5 @@
-// Cite selected text by textile formatting it, properly indenting it, and embedding the website's metadata. Load jQuery if not present
-// Keyboard Shortcut: alt-s
+// Cite selected text by textile formatting it, properly indenting it, and embedding the website's metadata.
+// Keyboard Shortcut: alt-c
 // File name: to-textile.js
 //
 // First made into an independent file: 16 October 2012
