@@ -20,11 +20,14 @@
 	function parseQuote() {
 		var quote = '',
 			url = location.toString(),
-			selection = window.getSelection().toString();
+			selection = window.getSelection().toString(),
+			eco = economistDetails();
 
 		url = shorten(url);
+		var title= '_'+document.title.replace(/^Amazon\.com\s*\:\s*/,'')+'_ '+
+			eco.date+url+' '+dateNotch()+eco.rubric;
 
-		quote += '_'+document.title.replace(/^Amazon\.com\s*\:\s*/,'')+'_ '+url+' '+dateNotch();
+		quote += title;
 		if(selection.match(/\S/)) {
 			quote += "\n\t"+selection.replace(/\n\n/g,"\n").replace(/\n/g,"\n\t");
 		}
@@ -51,7 +54,23 @@
 	function withJquery($) {
 		alert(parseQuote());
 		toTextile($);
-	};
+	}
+
+	function economistDetails() {
+		var out = {date:'', rubric:''};
+		if(location.toString().match(/economist\.com/)) {
+			$('.dateline .source').remove();
+			out.date = $('.dateline').text().trim();
+			if(out.date) {
+				out.date = '('+out.date+') ';
+				out.rubric = $('.rubric').text().trim();
+				if(out.rubric) {
+					out.rubric = "\n\t__"+out.rubric+"__"
+				}
+			}
+		}
+		return out;
+	}
 
 	function punctuation(text) {
 		return text.
