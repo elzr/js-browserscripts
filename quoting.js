@@ -51,19 +51,15 @@
 			now.getTime()+'epoch');
 	}
 
-	function withJquery($) {
-		alert(parseQuote());
-		toTextile($);
-	}
-
 	function economistDetails() {
-		var out = {date:'', rubric:''};
+		var out = {date:'', rubric:''},
+			article = $('article[itemtype]');
 		if(location.toString().match(/economist\.com/)) {
-			$('.dateline .source').remove();
-			out.date = $('.dateline').text().trim();
+			article.remove('.source');
+			out.date = article.find('.date-created, .dateline').text().trim();
 			if(out.date) {
 				out.date = '('+out.date+') ';
-				out.rubric = $('.rubric').text().trim();
+				out.rubric = article.find('.rubric').text().trim();
 				if(out.rubric) {
 					out.rubric = "\n\t__"+out.rubric+"__"
 				}
@@ -115,6 +111,28 @@
 		};
 	};
 
+	function shorten(str) {
+		if(str.match(/amazon\.com/)) {
+			var parse = str.match(/(https?:\/\/[^\/]+\/).*?\/dp\/([^\/]+)(\/|$)/);
+			parse || (parse = str.match(/(https?:\/\/[^\/]+\/).*?gp\/product\/([\w]+)/));
+			if(parse && (parse.length >= 3)) {
+				str = 'https://amzn.com/' + parse[2];
+			}
+		} else if(str.match(/economist\.com/)) {
+			var parse = str.match(/(https?:\/\/[^\/]+\/).*?\/.*?(\d{8,})/);
+			parse && (str = 'https://economist.com/node/' + parse[2]);
+		}
+		//console.log(str);
+		return str;
+	};
+
+	/* Script loading & running */
+	//---------------------------------------------
+	function withJquery($) {
+		alert(parseQuote());
+		toTextile($);
+	}
+
 	function loadJquery(callback) {
 		var script = document.createElement("script");
 		script.type = "text/javascript";
@@ -135,19 +153,4 @@
 	} else {
 		loadJquery(withJquery);
 	}
-
-	function shorten(str) {
-		if(str.match(/amazon\.com/)) {
-			var parse = str.match(/(https?:\/\/[^\/]+\/).*?\/dp\/([^\/]+)(\/|$)/);
-			parse || (parse = str.match(/(https?:\/\/[^\/]+\/).*?gp\/product\/([\w]+)/));
-			if(parse && (parse.length >= 3)) {
-				str = 'https://amzn.com/' + parse[2];
-			}
-		} else if(str.match(/economist\.com/)) {
-			var parse = str.match(/(https?:\/\/[^\/]+\/).*?\/.*?(\d{8,})/);
-			parse && (str = 'https://economist.com/node/' + parse[2]);
-		}
-		//console.log(str);
-		return str;
-	};
 })();

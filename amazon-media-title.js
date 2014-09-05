@@ -89,7 +89,7 @@
 	};
 	
 	/* Script loading & running */
-
+	//---------------------------------------------
 	function withJquery(jQuery) {
 		alert(extractMedia(jQuery));
 	};
@@ -116,11 +116,9 @@
 			loadScript('https://ajax.googleapis.com/ajax/libs/jquery/2.0.3/jquery.min.js', withJquery);
 		}
 	}
-
 	if(typeof _ != 'undefined') {
 		checkJquery();
 	} else {
 		loadScript('http://underscorejs.org/underscore-min.js', checkJquery);
 	}
-
 })();

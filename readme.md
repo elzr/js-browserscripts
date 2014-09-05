@@ -11,4 +11,4 @@ They all load jQuery if not present.
 
 I use them with the [**Shortcut Manager** Chrome extesion](https://chrome.google.com/webstore/detail/shortcut-manager/mgjjeipcdnnjhgodgjpfkffcejoljijf?hl=en) which allows me to trigger them on any website via a keyboard shortcut. Very handy.
 
-Hosted here in Github and executed remotely via [RawGit](http://rawgit.com/) ([why?](http://stackoverflow.com/questions/17341122/link-and-execute-external-javascript-file-hosted-on-github)) so that it's synched across my computers.
+Executed from here in Github so that they're synched across my computers.
