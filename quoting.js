@@ -17,11 +17,11 @@
 // 26aug2014: further tweaking of padding to get it right
 
 (function () {
-	function parseQuote() {
+	function parseQuote($) {
 		var quote = '',
 			url = location.toString(),
 			selection = window.getSelection().toString(),
-			eco = economistDetails();
+			eco = economistDetails($);
 
 		url = shorten(url);
 		var title= '_'+document.title.replace(/^Amazon\.com\s*\:\s*/,'')+'_ '+
@@ -51,7 +51,7 @@
 			now.getTime()+'epoch');
 	}
 
-	function economistDetails() {
+	function economistDetails($) {
 		var out = {date:'', rubric:''},
 			article = $('article[itemtype]');
 		if(location.toString().match(/economist\.com/)) {
@@ -129,14 +129,16 @@
 	/* Script loading & running */
 	//---------------------------------------------
 	function withJquery($) {
-		alert(parseQuote());
+		var css = ['::selection {background-color:magenta}'].join('\n');
+		loadStyle(css);
+		alert(parseQuote($));
 		toTextile($);
 	}
 
 	function loadJquery(callback) {
 		var script = document.createElement("script");
 		script.type = "text/javascript";
-		script.src = "https://ajax.googleapis.com/ajax/libs/jquery/1.8.2/jquery.min.js";
+		script.src = "https://ajax.googleapis.com/ajax/libs/jquery/2.1.1/jquery.min.js";
 		script.onload = function () { callback(jQuery); };
 		document.getElementsByTagName("head")[0].appendChild(script);
 	}
@@ -152,5 +154,17 @@
 		withJquery(jQuery);
 	} else {
 		loadJquery(withJquery);
+	}
+
+	function loadStyle(css) {
+		var style = document.createElement('style');
+		style.type = 'text/css';
+		//via http://stackoverflow.com/questions/524696/how-to-create-a-style-tag-with-javascript
+		if (style.styleSheet){
+		  style.styleSheet.cssText = css;
+		} else {
+		  style.appendChild(document.createTextNode(css));
+		}
+		document.head.appendChild(style);
 	}
 })();

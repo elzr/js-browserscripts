@@ -113,7 +113,7 @@
 		if(typeof jQuery != 'undefined') {
 			withJquery(jQuery);
 		} else {
-			loadScript('https://ajax.googleapis.com/ajax/libs/jquery/2.0.3/jquery.min.js', withJquery);
+			loadScript('https://ajax.googleapis.com/ajax/libs/jquery/2.1.1/jquery.min.js', withJquery);
 		}
 	}
 	if(typeof _ != 'undefined') {
