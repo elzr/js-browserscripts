@@ -20,12 +20,13 @@
 	function parseQuote($) {
 		var quote = '',
 			url = location.toString(),
-			selection = window.getSelection().toString(),
-			eco = economistDetails($);
+			selection = window.getSelection().toString();
+		details.get($);
 
 		url = shorten(url);
-		var title= '_'+document.title.replace(/^Amazon\.com\s*\:\s*/,'')+'_ '+
-			eco.date+url+' '+dateNotch()+eco.rubric;
+		var title= '_'+document.title.replace(/^Amazon\.com\s*\:\s*/,'')+'_ ';
+		title = details.before + title +
+			details.middle + url+' '+dateNotch()+ details.after;
 
 		quote += title;
 		if(selection.match(/\S/)) {
@@ -51,21 +52,41 @@
 			now.getTime()+'epoch');
 	}
 
-	function economistDetails($) {
-		var out = {date:'', rubric:''},
-			article = $('article[itemtype]');
-		if(location.toString().match(/economist\.com/)) {
-			article.remove('.source');
-			out.date = article.find('.date-created, .dateline').text().trim();
-			if(out.date) {
-				out.date = '('+out.date+') ';
-				out.rubric = article.find('.rubric').text().trim();
-				if(out.rubric) {
-					out.rubric = "\n\t__"+out.rubric+"__"
+	var details = {
+		before:'', middle:'', after:'',
+		get:function($) {
+			if( weAt('economist.com') ) {
+				this.economist($);
+			} else if( weAt('safaribooksonline.com') ) {
+				this.safari($);
+			}
+		},
+		economist:function($) {
+			var article = $('article[itemtype], #column-content');
+				article.remove('.source');
+			var date = article.find('.date-created, .dateline').text().trim();
+			if(date) {
+				date = '('+date+') ';
+				this.middle = date;
+				var rubric = article.find('.rubric').text().trim();
+				if(rubric) {
+					rubric = "\n\t__"+rubric+"__";
+					this.after = rubric;
 				}
 			}
+		},
+		safari:function() {
+			var info = $('.detail-book .title-info');
+
+			if(info) {
+				var author = info.find('.author').text().trim().replace(/^by\s*/,''),
+					publisher = info.find('.publisher').text().trim().replace(/^[^:]*:\s*/,''),
+					date = info.find('.issued').text().trim().replace(/^[^:]*:\s*/,''),
+					isbn = info.find('.isbn').text().replace(/\D/g,'');
+				this.before = author+' ';
+				this.middle = date+' ('+publisher+') isbn:'+isbn+' ';
+			}
 		}
-		return out;
 	}
 
 	function punctuation(text) {
@@ -111,19 +132,24 @@
 		};
 	};
 
-	function shorten(str) {
-		if(str.match(/amazon\.com/)) {
-			var parse = str.match(/(https?:\/\/[^\/]+\/).*?\/dp\/([^\/]+)(\/|$)/);
-			parse || (parse = str.match(/(https?:\/\/[^\/]+\/).*?gp\/product\/([\w]+)/));
+	function weAt(domain) {
+		domain = new RegExp( '\\/\\/[^\\/]*' + domain.replace(/\./,'\\.'), 'i' );
+		return location.toString().match( domain );
+	}
+
+	function shorten(url) {
+		if( weAt('amazon.com') ) {
+			var parse = url.match(/(https?:\/\/[^\/]+\/).*?\/dp\/([^\/]+)(\/|$)/);
+			parse || (parse = url.match(/(https?:\/\/[^\/]+\/).*?gp\/product\/([\w]+)/));
 			if(parse && (parse.length >= 3)) {
-				str = 'https://amzn.com/' + parse[2];
+				url = 'https://amzn.com/' + parse[2];
 			}
-		} else if(str.match(/economist\.com/)) {
-			var parse = str.match(/(https?:\/\/[^\/]+\/).*?\/.*?(\d{8,})/);
-			parse && (str = 'https://economist.com/node/' + parse[2]);
+		} else if( weAt('economist.com') ) {
+			var parse = url.match(/(https?:\/\/[^\/]+\/).*?\/.*?(\d{8,})/);
+			parse && (url = 'https://economist.com/node/' + parse[2]);
 		}
-		//console.log(str);
-		return str;
+		//console.log(url);
+		return url;
 	};
 
 	/* Script loading & running */
