@@ -155,7 +155,7 @@
 	/* Script loading & running */
 	//---------------------------------------------
 	function withJquery($) {
-		var css = ['::selection {background-color:magenta}'].join('\n');
+		var css = ['::selection {background-color:#DC3855}'].join('\n');
 		loadStyle(css);
 		alert(parseQuote($));
 		toTextile($);
