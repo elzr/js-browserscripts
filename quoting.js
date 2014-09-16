@@ -61,12 +61,18 @@
 				this.safari($);
 			}
 		},
+		dateReformat:function(date) {
+			var day = date.match(/\d{1,2}/)[0],
+				year = date.match(/\d{4}/)[0],
+				month = date.match(/\b[a-z]+\b/i)[0].toLowerCase();
+			return day+month+year;
+		},
 		economist:function($) {
 			var article = $('article[itemtype], #column-content');
 				article.remove('.source');
 			var date = article.find('.date-created, .dateline').text().trim();
 			if(date) {
-				date = '('+date+') ';
+				date = '('+this.dateReformat( date )+') ';
 				this.middle = date;
 				var rubric = article.find('.rubric').text().trim();
 				if(rubric) {
@@ -84,7 +90,7 @@
 					date = info.find('.issued').text().trim().replace(/^[^:]*:\s*/,''),
 					isbn = info.find('.isbn').text().replace(/\D/g,'');
 				this.before = author+' ';
-				this.middle = date+' ('+publisher+') isbn:'+isbn+' ';
+				this.middle = this.dateReformat( date )+' ('+publisher+') isbn:'+isbn+' ';
 			}
 		}
 	}
