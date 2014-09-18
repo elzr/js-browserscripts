@@ -10,7 +10,7 @@
 (function () {
 	function cleanText(el) {
 		return el.find('span.a-size-medium').remove().end().
-			text().trim().replace(/ \[[^\]]+\]/g,'').replace(/\s*\n.*$/,'');
+			text().trim().replace(/ \[[^\]]+\]/g,'').replace(/ \([^\)]+\)/g,'').replace(/\s*\n.*$/,'');
 	}
 	function getExisting(queryArray) {
 		var existing = _(queryArray).find(function(query) {
@@ -28,10 +28,11 @@
 		return ounces*pounds;
 	}
 	function dateReformat(date) {
-		var day = date.match(/\d{1,2}/)[0],
-			year = date.match(/\d{4}/)[0],
-			month = date.match(/\b[a-z]+\b/i)[0].toLowerCase().slice(0,3);
+		var day = (date.match(/\b\d{1,2}\b/)||[''])[0],
+			year = (date.match(/\b\d{4}\b/)||[''])[0],
+			month = (date.match(/\b[a-z]+\b/i)||[''])[0].toLowerCase().slice(0,3);
 		return day+month+year;
+		return '';
 	}
 	function publisherProcess(str) {
 		return str.replace(/(;[^\)]*)?\s+\(/,' (').replace(/\(([^)]+)\)$/,
@@ -39,33 +40,39 @@
 				return dateReformat(date);
 			}).replace(/(.+?) (\S+)$/,"$2 ($1)")+' ';
 	}
+	function getAuthors($) {
+		var authors = getExisting([ 'div#byline .author .a-link-normal.contributorNameID', 'div#byline .author .a-link-normal', '.contributorNameTrigger', 'h1.parseasinTitle + a', 'h1.parseasinTitle + span > a']),
+			 contribs = getExisting([ 'div#byline .author .contribution', 'div#byline .author .a-link-normal + .contribution', 'h1.parseasinTitle + span > span.byLinePipe' ]);
+			console.log('contribs', contribs);
+			console.log('contribs.length', contribs.length);
+		return _(authors).map( function(author, i) {
+			console.log('i', i);
+			console.log('c i 0 ', contribs[i]);
+			console.log('c i 1 ', $(contribs[i]));
+			var contrib = contribs[i] ? ' '+$(contribs[i]).text().trim() : '';
+			contrib = (contrib.match(/author|auteur/i) || contrib.match(/^\s$/)) ? '' : contrib.replace(/,/g,'');
+			return $(author).text().trim()+contrib;
+		}).join(', ');
+	}
 	function extractMedia($) {
 		var title = cleanText( getExisting(['h1#title', 'span#btAsinTitle'])),
-			author = getExisting([ 'div#byline .author .a-link-normal.contributorNameID:first', 'div#byline .author .a-link-normal:first', '.contributorNameTrigger:first', 'h1.parseasinTitle + a', 'h1.parseasinTitle + span > a:first']).text().trim(),
-				authorContribution = ' '+getExisting([ 'div#byline .author .a-link-normal:first + .contribution', 'div#byline .author:first .contribution', 'h1.parseasinTitle + span > span.byLinePipe:first' ]).text().trim(),
-			secondAuthor = $('div#byline .author + .author .a-link-normal.contributorNameID:last, div#byline .author + .author .a-link-normal:last, .contributorNameTrigger:eq(1), h1.parseasinTitle + span > a:last').text().trim(),
-				//div#byline .author .a-declarative > .a-link-normal
-				secondAuthorContribution = ' '+getExisting([ 'div#byline .author + .author > .contribution:last', 'h1.parseasinTitle + span > span.byLinePipe:last' ]).text().trim(),
+			authors = getAuthors($);
 			productDetails = getExisting(['#productDetailsTable .content', 'div.pdTab table', 'table td.bucket']),
 			pages = productDetails.find('li:contains(pages), li:contains(Seiten)').text().match(/\d+/),
 			publisher = productDetails.find('li:contains(Publisher), li:contains(Verlag)').text().match(/: (.*)/),
 			shippingWeight = extractWeight( productDetails.find('li:contains(Shipping Weight), tr.size-weight td.value:first') ),
 			itemWeight = extractWeight( productDetails.find('li:contains(Item Weight)') ),
-			price = $('#combinedPriceBlock span.a-color-price, #tmmSwatches span.a-color-price').text().trim().replace(/\$([\d\.]+)/,"$1usd"),
+			price = $('#combinedPriceBlock span.a-color-price:first, #tmmSwatches span.a-color-price:first').text().trim().replace(/\$([\d\.]+)/,"$1usd"),
 			url = location.toString();
-		
 
-		secondAuthor = secondAuthor ? ', '+secondAuthor : '';
 		publisher = publisher ? publisherProcess(publisher[1]) : '';
 		pages = pages ? pages[0]+'p ' : ' ';
 		price = price ? price+' ' : '';
-		(authorContribution.match(/author|auteur/i) || authorContribution.match(/^\s$/)) && (authorContribution = '');
-		(secondAuthorContribution.match(/author|auteur/i) || secondAuthorContribution.match(/^\s$/)) && (secondAuthorContribution = '');
 
 		url = shorten(url);
 
 		var extraction = (//(shippingWeight + itemWeight + 
-			price+author+authorContribution + secondAuthor+secondAuthorContribution +
+			price + authors +
 			' _'+title+'_ ' + pages + publisher + url+' '+dateNotch())
 		return extraction;
 	};
@@ -89,7 +96,7 @@
 
 	function shorten(str) {
 		if(str.match(/amazon\.([^\/]+?)\//)) {
-			var parseId = str.match(/(https?:\/\/[^\/]+\/).*?\/dp\/([^\/]+)(\/|$)/),
+			var parseId = str.match(/(https?:\/\/[^\/]+\/).*?dp\/([^\/]+)/),
 				countryCodeDomain = str.match('amazon\.com') ? 'us' : str.match(/amazon\.([^\/]+?)\//)[1];
 			parseId || (parseId = str.match(/(https?:\/\/[^\/]+\/).*?gp\/product\/([\w]+)/));
 			if(parseId && (parseId.length >= 3)) {

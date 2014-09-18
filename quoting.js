@@ -62,9 +62,9 @@
 			}
 		},
 		dateReformat:function(date) {
-			var day = date.match(/\d{1,2}/)[0],
-				year = date.match(/\d{4}/)[0],
-				month = date.match(/\b[a-z]+\b/i)[0].toLowerCase();
+			var day = (date.match(/\b\d{1,2}\b/)||[''])[0],
+				year = (date.match(/\b\d{4}\b/)||[''])[0],
+				month = (date.match(/\b[a-z]+\b/i)||[''])[0].toLowerCase().slice(0,3);
 			return day+month+year;
 		},
 		economist:function($) {
