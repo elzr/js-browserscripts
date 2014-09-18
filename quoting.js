@@ -103,7 +103,7 @@
 			replace(/—/g, '--'). //em-dash
 			replace(/“/g, '"'). //opening double quotes
 			replace(/”/g, '"'). //closing double quotes
-			replace(/([^\w>]|^)‘/g, "$1\""). //opening single quote
+			//replace(/([^\w>]|^)‘/g, "$1\""). //opening single quote
 			replace(/([^s])’([^\w>]|$)/g, "$1\"$2"). //closing single quote converted to double quote except for plurals
 			replace(/’|‘/g, "'"). //opening & closing single quotes
 			replace(/„/g, '"'). //lower opening double quotes
