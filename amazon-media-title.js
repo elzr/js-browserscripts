@@ -27,6 +27,18 @@
 			pounds = (text.match(/pounds/) ? 0.453592 : 1);
 		return ounces*pounds;
 	}
+	function dateReformat(date) {
+		var day = date.match(/\d{1,2}/)[0],
+			year = date.match(/\d{4}/)[0],
+			month = date.match(/\b[a-z]+\b/i)[0].toLowerCase().slice(0,3);
+		return day+month+year;
+	}
+	function publisherProcess(str) {
+		return str.replace(/(;[^\)]*)?\s+\(/,' (').replace(/\(([^)]+)\)$/,
+			function(match, date) {
+				return dateReformat(date);
+			}).replace(/(.+?) (\S+)$/,"$2 ($1)")+' ';
+	}
 	function extractMedia($) {
 		var title = cleanText( getExisting(['h1#title', 'span#btAsinTitle'])),
 			author = getExisting([ 'div#byline .author .a-link-normal.contributorNameID:first', 'div#byline .author .a-link-normal:first', '.contributorNameTrigger:first', 'h1.parseasinTitle + a', 'h1.parseasinTitle + span > a:first']).text().trim(),
@@ -36,21 +48,24 @@
 				secondAuthorContribution = ' '+getExisting([ 'div#byline .author + .author > .contribution:last', 'h1.parseasinTitle + span > span.byLinePipe:last' ]).text().trim(),
 			productDetails = getExisting(['#productDetailsTable .content', 'div.pdTab table', 'table td.bucket']),
 			pages = productDetails.find('li:contains(pages), li:contains(Seiten)').text().match(/\d+/),
-			publisher = productDetails.find('li:contains(Publisher), li:contains(Verlag)').text().match(/: (.*$)/),
+			publisher = productDetails.find('li:contains(Publisher), li:contains(Verlag)').text().match(/: (.*)/),
 			shippingWeight = extractWeight( productDetails.find('li:contains(Shipping Weight), tr.size-weight td.value:first') ),
 			itemWeight = extractWeight( productDetails.find('li:contains(Item Weight)') ),
+			price = $('#combinedPriceBlock span.a-color-price, #tmmSwatches span.a-color-price').text().trim().replace(/\$([\d\.]+)/,"$1usd"),
 			url = location.toString();
 		
+
 		secondAuthor = secondAuthor ? ', '+secondAuthor : '';
-		publisher = publisher ? '('+publisher[1].replace(/ \(/,') (')+' ' : '';
+		publisher = publisher ? publisherProcess(publisher[1]) : '';
 		pages = pages ? pages[0]+'p ' : ' ';
+		price = price ? price+' ' : '';
 		(authorContribution.match(/author|auteur/i) || authorContribution.match(/^\s$/)) && (authorContribution = '');
 		(secondAuthorContribution.match(/author|auteur/i) || secondAuthorContribution.match(/^\s$/)) && (secondAuthorContribution = '');
 
 		url = shorten(url);
 
 		var extraction = (//(shippingWeight + itemWeight + 
-			author+authorContribution + secondAuthor+secondAuthorContribution +
+			price+author+authorContribution + secondAuthor+secondAuthorContribution +
 			' _'+title+'_ ' + pages + publisher + url+' '+dateNotch())
 		return extraction;
 	};
