@@ -42,7 +42,8 @@
 	}
 	function getAuthors($) {
 		//clear up bothersome popups that mess up the copypaste
-		$('.a-popover-trigger').remove(); $('.a-declarative').removeAttr('data-action');
+		$('.a-popover-trigger, .a-popover-preload').remove(); 
+		$('.a-declarative').removeAttr('data-action');
 		var authors = getExisting([ 'div#byline .author .a-link-normal', '.contributorNameTrigger', 'h1.parseasinTitle + a', 'h1.parseasinTitle + span > a']),
 			 contribs = getExisting([ 'div#byline .author .contribution', 'div#byline .author .a-link-normal + .contribution', 'h1.parseasinTitle + span > span.byLinePipe' ]);
 			console.log('contribs', contribs);
