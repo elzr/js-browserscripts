@@ -46,12 +46,7 @@
 		$('.a-declarative').removeAttr('data-action');
 		var authors = getExisting([ 'div#byline .author .a-link-normal', '.contributorNameTrigger', 'h1.parseasinTitle + a', 'h1.parseasinTitle + span > a']),
 			 contribs = getExisting([ 'div#byline .author .contribution', 'div#byline .author .a-link-normal + .contribution', 'h1.parseasinTitle + span > span.byLinePipe' ]);
-			console.log('contribs', contribs);
-			console.log('contribs.length', contribs.length);
 		return _(authors).map( function(author, i) {
-			console.log('i', i);
-			console.log('c i 0 ', contribs[i]);
-			console.log('c i 1 ', $(contribs[i]));
 			var contrib = contribs[i] ? ' '+$(contribs[i]).text().trim() : '';
 			contrib = (contrib.match(/author|auteur/i) || contrib.match(/^\s$/)) ? '' : contrib.replace(/,/g,'');
 			return $(author).text().trim()+contrib;
