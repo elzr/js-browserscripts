@@ -116,7 +116,7 @@
 				this.before = OP.find('.author').text().trim()+' ';;
 				var time = OP.find('time:first').text();//.attr('datetime');
 				var votes = OP.find('.score.unvoted').text();
-				this.middle = ' '+votes+'votes ('+time+') ';
+				this.middle = ' '+votes+'points ('+time+') ';
 			}
 		},
 		dateReformat:function(date) {
