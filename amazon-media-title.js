@@ -2,6 +2,7 @@
 // File name: amazon-media-title.js
 // Keyboard Shortcut: alt-b
 // 28aug2014: disable weight
+// URL: https://raw.githubusercontent.com/elzr/js-browserscripts/master/amazon-media-title.js
 //
 // BUGS:
 // there seems to be some weirdness after clicking Read More in a book's description that blocks the script with the msg:
