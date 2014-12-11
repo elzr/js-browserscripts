@@ -115,8 +115,8 @@
 				var OP = $('#siteTable'); //OP
 				this.before = OP.find('.author').text().trim()+' ';;
 				var time = OP.find('time:first').text();//.attr('datetime');
-				var votes = OP.find('.score.unvoted').text();
-				this.middle = ' '+votes+'points ('+time+') ';
+				var points = OP.find('.score.unvoted').text();
+				this.middle = ' '+points+'points ('+time+') ';
 			}
 		},
 		dateReformat:function(date) {
