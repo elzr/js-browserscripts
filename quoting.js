@@ -102,6 +102,7 @@
 				this.before = $('a[rel=author]').text().trim()+' ';
 				var date = $('*[itemprop=datePublished]').attr('content').match(/\d+/g);
 				this.middle = ' ('+date[2]+this.months[parseInt(date[1])-1]+date[0]+') ';
+				this.after = "\n\t__"+$('#masthead h2').text()+"__";
 			} else if( weAt('youtube.com') ) {
 				this.before = $('.yt-user-info').text().trim()+' ';
 				var date = $('.watch-time-text').text().replace(/\*/g,'').replace(/Published on /,'')
@@ -119,7 +120,8 @@
 				this.middle = ' '+points+'points ('+time+') ';
 			} else if( weAt('theatlantic.com') ) {
 				this.before = $('.metadata .authors').text().trim()+' ';
-				this.middle = ' ('+$('.metadata time').text().trim()+') ';
+				this.middle = ' ('+this.dateReformat( $('.metadata time').text() )+') ';
+				this.after = "\n\t__"+$('.dek[itemprop=description]').text()+"__";
 			}
 		},
 		dateReformat:function(date) {
