@@ -117,6 +117,9 @@
 				var time = OP.find('time:first').text();//.attr('datetime');
 				var points = OP.find('.score.unvoted').text();
 				this.middle = ' '+points+'points ('+time+') ';
+			} else if( weAt('theatlantic.com') ) {
+				this.before = $('.metadata .authors').text().trim()+' ';
+				this.middle = ' ('+$('.metadata time').text().trim()+') ';
 			}
 		},
 		dateReformat:function(date) {
