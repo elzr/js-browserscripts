@@ -27,7 +27,7 @@
 		details.get($);
 
 		url = shorten(url);
-		var title= '_'+document.title.replace(/^Amazon\.com\s*\:\s*/,'')+'_ ';
+		var title= '_'+document.title.replace(/^Amazon\.com\s*\:\s*/,'').replace(/—/g,'-')+'_ ';
 		title = details.before + title +
 			details.middle + url+' '+dateNotch()+ details.after;
 
@@ -96,32 +96,45 @@
 			} else if( weAt('safaribooksonline.com') ) {
 				this.safari($);
 			} else if( weAt('radar.oreilly.com') ) {
-				this.before = $('a[rel=author]').text().trim()+' ';
+				this.set.author( $('a[rel=author]') );
 				this.middle = ' ('+$('span.entry-date').text().trim()+') ';
 			} else if( weAt('newyorker.com') ) {
-				this.before = $('a[rel=author]').text().trim()+' ';
+				this.set.author( $('a[rel=author]') );
 				var date = $('*[itemprop=datePublished]').attr('content').match(/\d+/g);
 				this.middle = ' ('+date[2]+this.months[parseInt(date[1])-1]+date[0]+') ';
-				this.after = "\n\t__"+$('#masthead h2').text().trim()+"__";
+				this.set.subtitle( $('#masthead h2') );
 			} else if( weAt('youtube.com') ) {
-				this.before = $('.yt-user-info').text().trim()+' ';
+				this.set.author( $('.yt-user-info') );
 				var date = $('.watch-time-text').text().replace(/\*/g,'').replace(/Published on /,'')
 				this.middle = ' ('+this.dateReformat(date)+') ';
 			} else if( weAt('news.ycombinator.com') ) {
 				var subtext = $('.subtext');
-				this.before = subtext.find('a:first').text().trim()+' ';
-				var time = subtext.contents().eq(3).text().replace(/\|/,'').trim();
-				this.middle = ' '+subtext.find('span:first').text().replace(/ /,'')+' ('+time+') ';
+				this.set.author( subtext.find('a:first') );
+				var date = subtext.contents().eq(3).text().replace(/\|/,'').trim();
+				this.middle = ' '+subtext.find('span:first').text().replace(/ /,'')+' ('+date+') ';
 			} else if( weAt('reddit.com') ) {
 				var OP = $('#siteTable'); //OP
-				this.before = OP.find('.author').text().trim()+' ';;
-				var time = OP.find('time:first').text();//.attr('datetime');
+				this.set.author( OP.find('.author') );
+				var date = OP.find('time:first').text();//.attr('datetime');
 				var points = OP.find('.score.unvoted').text();
-				this.middle = ' '+points+'points ('+time+') ';
+				this.middle = ' '+points+'points ('+date+') ';
 			} else if( weAt('theatlantic.com') ) {
-				this.before = $('.metadata .authors').text().trim()+' ';
+				this.set.author( $('.metadata .authors') );
 				this.middle = ' ('+this.dateReformat( $('.metadata time').text() )+') ';
-				this.after = "\n\t__"+$('.dek[itemprop=description]').text().trim()+"__";
+				this.set.subtitle( $('.dek[itemprop=description]') );
+			} else if( weAt('medium.com') ) {
+				this.set.author( $('.metabar-block .avatar-span') );
+				var date = $('.metabar-block time.post-date').text().trim().replace(/ /,'').replace(/\d\d/,"20$&").toLowerCase()
+				this.middle = ' ('+date+') ';
+				this.set.subtitle( $('.section-content h4') );
+			}
+		},
+		set:{
+			author:function(author) {
+				details.before = author.text().trim()+' ';
+			},
+			subtitle:function(subtitle) {
+				details.after = "\n\t__"+ subtitle.text().trim().replace(/_/g,'') +"__";
 			}
 		},
 		dateReformat:function(date) {
