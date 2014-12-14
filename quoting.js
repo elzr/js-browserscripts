@@ -24,14 +24,12 @@
 		var quote = '',
 			url = location.toString(),
 			selection = window.getSelection().toString();
-		details.get($);
+		details.boot($);
 
 		url = shorten(url);
-		var title= '_'+document.title.replace(/^Amazon\.com\s*\:\s*/,'').replace(/—/g,'-')+'_ ';
-		title = details.before + title +
-			details.middle + url+' '+dateNotch()+ details.after;
+		var head = details.before + details.title + details.middle + url+' '+dateNotch()+ details.after;
 
-		quote += title;
+		quote += head;
 		if(selection.match(/\S/)) {
 			quote += "\n\t"+selection.replace(/\n\n/g,"\n").replace(/\n/g,"\n\t");
 		}
@@ -88,14 +86,12 @@
 	// **** DETAILS ****
 
 	var details = {
-		before:'', middle:'', after:'',
+		before:'', middle:'', after:'', title:'',
 		monthNames: ['jan', 'feb', 'mar', 'apr', 'may', 'jun', 'jul', 'aug', 'sep', 'oct', 'nov', 'dec'],
 		dayNames: ['mon', 'tue', 'wed', 'thu', 'fri', 'sat', 'sun'],
-		get:function($) {
-			if( weAt('economist.com') ) {
-				this.economist($);
-			} else if( weAt('safaribooksonline.com') ) {
-				this.safari($);
+		boot:function($) { this.set.title();
+			if( weAt('economist.com') ) { this.economist($);
+			} else if( weAt('safaribooksonline.com') ) { this.safari($);
 			} else if( weAt('radar.oreilly.com') ) {
 				this.set.author( $('a[rel=author]') );
 				this.middle = ' ('+$('span.entry-date').text().trim()+') ';
@@ -131,11 +127,24 @@
 				this.set.author( $('.profile-data a[rel=author]') );
 				var date = $('h2.date-header').text().trim();
 				this.middle = ' ('+this.dateReformat(date)+') ';
+			} else if( weAt('ted.com') ) {
+				this.set.author( $('meta[name=author]') );
+				var date = $('.player-pip__meta .player-pip__meta__value:first').text().trim();
+				var duration = $('.player-pip__meta .player-pip__meta__value:last').text().trim().replace(/:/,'m')+'s';
+				this.middle = ' ('+this.dateReformat(date)+') '+duration+' ';
+				this.set.subtitle( $('p.talk-description') );
 			}
 		},
 		set:{
-			author:function(text) {
-				details.before = text.text().trim()+' ';
+			title:function() { details.title = document.title;
+				if( weAt('ted.com') ) {
+					details.title = details.title.replace(/^[^:]+\:\s*/,'').replace(/ \| TED.com$/,'').replace(/ \|[^|]*$/,'');
+				}
+				details.title = '_'+ details.title.replace(/^Amazon\.com\s*\:\s*/,'').replace(/—/g,'-') +'_ ';
+				return details.title;
+			},
+			author:function(author) {
+				details.before = (author.text() || author.attr('content')).trim()+' ';
 			},
 			subtitle:function(text) { text = text.text().trim();
 				text && (details.after = "\n\t__"+ text.replace(/_/g,'') +"__");
