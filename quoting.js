@@ -89,7 +89,8 @@
 
 	var details = {
 		before:'', middle:'', after:'',
-		months: ['jan', 'feb', 'mar', 'apr', 'may', 'jun', 'jul', 'aug', 'sep', 'oct', 'nov', 'dec'],
+		monthNames: ['jan', 'feb', 'mar', 'apr', 'may', 'jun', 'jul', 'aug', 'sep', 'oct', 'nov', 'dec'],
+		dayNames: ['mon', 'tue', 'wed', 'thu', 'fri', 'sat', 'sun'],
 		get:function($) {
 			if( weAt('economist.com') ) {
 				this.economist($);
@@ -101,7 +102,7 @@
 			} else if( weAt('newyorker.com') ) {
 				this.set.author( $('a[rel=author]') );
 				var date = $('*[itemprop=datePublished]').attr('content').match(/\d+/g);
-				this.middle = ' ('+date[2]+this.months[parseInt(date[1])-1]+date[0]+') ';
+				this.middle = ' ('+date[2]+this.monthNames[parseInt(date[1])-1]+date[0]+') ';
 				this.set.subtitle( $('#masthead h2') );
 			} else if( weAt('youtube.com') ) {
 				this.set.author( $('.yt-user-info') );
@@ -127,6 +128,10 @@
 				var date = $('.metabar-block time.post-date').text().trim().replace(/ /,'').replace(/\d\d/,"20$&").toLowerCase()
 				this.middle = ' ('+date+') ';
 				this.set.subtitle( $('.section-content h4') );
+			} else if( weAt('blogspot') ) {
+				this.set.author( $('.profile-data a[rel=author]') );
+				var date = $('h2.date-header').text().trim();
+				this.middle = ' ('+this.dateReformat(date)+') ';
 			}
 		},
 		set:{
@@ -137,11 +142,12 @@
 				details.after = "\n\t__"+ subtitle.text().trim().replace(/_/g,'') +"__";
 			}
 		},
-		dateReformat:function(date) {
+		dateReformat:function(date) { date = date.toLowerCase();
 			var day = (date.match(/\b\d{1,2}\b/)||[''])[0],
 				year = (date.match(/\b\d{4}\b/)||[''])[0],
-				month = (date.match(/\b[a-z]+\b/i)||[''])[0].toLowerCase().slice(0,3);
-			return day+month+year;
+				dayName = (date.match( new RegExp('\\b('+this.dayNames.join('|')+')') )||[''])[0],
+				month = (date.match( new RegExp('\\b('+this.monthNames.join('|')+')') )||[''])[0];
+			return dayName+day+month+year;
 		},
 		economist:function($) {
 			var article = $('article[itemtype], #column-content');
