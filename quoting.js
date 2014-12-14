@@ -125,8 +125,7 @@
 				this.set.subtitle( $('.dek[itemprop=description]') );
 			} else if( weAt('medium.com') ) {
 				this.set.author( $('.metabar-block .avatar-span') );
-				var date = $('.metabar-block time.post-date').text().trim().replace(/ /,'').replace(/\d\d/,"20$&").toLowerCase()
-				this.middle = ' ('+date+') ';
+				this.middle = ' ('+ this.dateReformat( GLOBALS.embedded.post.virtuals.firstPublishedAtEnglish ) +') ';
 				this.set.subtitle( $('.section-content h4') );
 			} else if( weAt('blogspot') ) {
 				this.set.author( $('.profile-data a[rel=author]') );
@@ -135,11 +134,11 @@
 			}
 		},
 		set:{
-			author:function(author) {
-				details.before = author.text().trim()+' ';
+			author:function(text) {
+				details.before = text.text().trim()+' ';
 			},
-			subtitle:function(subtitle) {
-				details.after = "\n\t__"+ subtitle.text().trim().replace(/_/g,'') +"__";
+			subtitle:function(text) { text = text.text().trim();
+				text && (details.after = "\n\t__"+ text.replace(/_/g,'') +"__");
 			}
 		},
 		dateReformat:function(date) { date = date.toLowerCase();
