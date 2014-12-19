@@ -138,8 +138,8 @@
 				this.set.author( $('meta[name=author]') );
 				$('.player-hero__meta__label').remove();
 				var date = $('.player-pip__meta .player-pip__meta__value:first, .player-hero__meta span:eq(1)').text().trim();
-				//var duration = $('.player-pip__meta .player-pip__meta__value:last, .player-hero__meta span:eq(0)').text().trim().replace(/:/,'m')+'s';
-				this.middle = ' ('+DATE.reformat(date)+') ';//+duration+' ';
+				var duration = $('.player-pip__meta .player-pip__meta__value:last, .player-hero__meta span:eq(0)').text().trim().replace(/:/,'m')+'s';
+				this.middle = ' ('+DATE.reformat(date)+') '+duration+' ';
 				this.set.subtitle( $('p.talk-description') );
 			} else if( weAt('elfinanciero.com.mx') ) {
 				this.set.author( $('.details-box span.important, .blog-author, .author-name').first() );
