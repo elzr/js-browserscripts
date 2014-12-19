@@ -62,11 +62,13 @@
 	};
 
 	var DATE = {
+		monthNames: ['jan', 'feb', 'mar', 'apr', 'may', 'jun', 'jul', 'aug', 'sep', 'oct', 'nov', 'dec'],
+		dayNames: ['mon', 'tue', 'wed', 'thu', 'fri', 'sat', 'sun'],
 		reformat:function(date) { date = date.toLowerCase();
 			var day = (date.match(/\b\d{1,2}\b/)||[''])[0],
 				year = (date.match(/\b\d{4}\b/)||[''])[0],
-				dayName = (date.match( new RegExp('\\b('+this.dayNames.join('|')+')') )||[''])[0],
-				month = (date.match( new RegExp('\\b('+this.monthNames.join('|')+')') )||[''])[0];
+				dayName = (date.match( new RegExp('\\b('+DATE.dayNames.join('|')+')') )||[''])[0],
+				month = (date.match( new RegExp('\\b('+DATE.monthNames.join('|')+')') )||[''])[0];
 			return dayName+day+month+year;
 		},
 		notch:function( time ) { time = time || new Date();
@@ -94,8 +96,6 @@
 	// **** DETAILS ****
 	var DETAILS = {
 		before:'', middle:'', after:'', title:'',
-		monthNames: ['jan', 'feb', 'mar', 'apr', 'may', 'jun', 'jul', 'aug', 'sep', 'oct', 'nov', 'dec'],
-		dayNames: ['mon', 'tue', 'wed', 'thu', 'fri', 'sat', 'sun'],
 		boot:function($) { this.set.title();
 			if( weAt('economist.com') ) { this.economist($);
 			} else if( weAt('safaribooksonline.com') ) { this.safari($);
@@ -105,7 +105,7 @@
 			} else if( weAt('newyorker.com') ) {
 				this.set.author( $('a[rel=author]') );
 				var date = $('*[itemprop=datePublished]').attr('content').match(/\d+/g);
-				this.middle = ' ('+date[2]+this.monthNames[parseInt(date[1])-1]+date[0]+') ';
+				this.middle = ' ('+date[2]+DATE.monthNames[parseInt(date[1])-1]+date[0]+') ';
 				this.set.subtitle( $('#masthead h2') );
 			} else if( weAt('youtube.com') ) {
 				this.set.author( $('.yt-user-info') );
@@ -136,12 +136,13 @@
 				this.middle = ' ('+DATE.reformat(date)+') ';
 			} else if( weAt('ted.com') ) {
 				this.set.author( $('meta[name=author]') );
-				var date = $('.player-pip__meta .player-pip__meta__value:first').text().trim();
-				var duration = $('.player-pip__meta .player-pip__meta__value:last').text().trim().replace(/:/,'m')+'s';
-				this.middle = ' ('+DATE.reformat(date)+') '+duration+' ';
+				$('.player-hero__meta__label').remove();
+				var date = $('.player-pip__meta .player-pip__meta__value:first, .player-hero__meta span:eq(1)').text().trim();
+				//var duration = $('.player-pip__meta .player-pip__meta__value:last, .player-hero__meta span:eq(0)').text().trim().replace(/:/,'m')+'s';
+				this.middle = ' ('+DATE.reformat(date)+') ';//+duration+' ';
 				this.set.subtitle( $('p.talk-description') );
 			} else if( weAt('elfinanciero.com.mx') ) {
-				this.set.author( $('.blog-author, .author-name, .details-box span.important') );
+				this.set.author( $('.details-box span.important, .blog-author, .author-name').first() );
 				var date = parseInt( $('.publishDate:first').attr('data-timestamp') * 1e3 );
 				this.middle = ' ('+DATE.notch( new Date(date) )+') ';
 			}
