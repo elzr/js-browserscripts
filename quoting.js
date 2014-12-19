@@ -24,10 +24,10 @@
 		var quote = '',
 			url = location.toString(),
 			selection = window.getSelection().toString();
-		details.boot($);
+		DETAILS.boot($);
 
 		url = shorten(url);
-		var head = details.before + details.title + details.middle + url+' '+dateNotch()+ details.after;
+		var head = DETAILS.before + DETAILS.title + DETAILS.middle + url+' '+DATE.notch()+ DETAILS.after;
 
 		quote += head;
 		if(selection.match(/\S/)) {
@@ -61,22 +61,30 @@
 		return url;
 	};
 
-	function dateNotch() {
-		//example 2013y9sep18wed-261d-14h44m04s539ms-5utc-1379533444539epoch
-		var now = new Date(), 
-			dateWords = (now+'').toLowerCase().split(' '),
-			hourMinSec = dateWords[4].split(':'),
-			start = new Date(now.getFullYear(), 0, 0),
-			diff = now - start,
-			oneDay = 1000 * 60 * 60 * 24,
-			dayOfTheYear = Math.floor(diff / oneDay);
+	var DATE = {
+		reformat:function(date) { date = date.toLowerCase();
+			var day = (date.match(/\b\d{1,2}\b/)||[''])[0],
+				year = (date.match(/\b\d{4}\b/)||[''])[0],
+				dayName = (date.match( new RegExp('\\b('+this.dayNames.join('|')+')') )||[''])[0],
+				month = (date.match( new RegExp('\\b('+this.monthNames.join('|')+')') )||[''])[0];
+			return dayName+day+month+year;
+		},
+		notch:function( time ) { time = time || new Date();
+			//example 2013y9sep18wed-261d-14h44m04s539ms-5utc-1379533444539epoch
+			var dateWords = (time+'').toLowerCase().split(' '),
+				hourMinSec = dateWords[4].split(':'),
+				start = new Date(time.getFullYear(), 0, 0),
+				diff = time - start,
+				oneDay = 1000 * 60 * 60 * 24,
+				dayOfTheYear = Math.floor(diff / oneDay);
 
-		return (dateWords[3]+'y'+(now.getMonth()+1)+dateWords[1]+dateWords[2]+dateWords[0]+'-'+
-			dayOfTheYear+'d-'+
-			hourMinSec[0]+'h'+hourMinSec[1]+'m'+hourMinSec[2]+'s'+now.getMilliseconds()+'ms'+
-			(-1*now.getTimezoneOffset()/60)+'utc-'+
-			now.getTime()+'epoch');
-	}
+			return (dateWords[3]+'y'+(time.getMonth()+1)+dateWords[1]+dateWords[2]+dateWords[0]+'-'+
+				dayOfTheYear+'d-'+
+				hourMinSec[0]+'h'+hourMinSec[1]+'m'+hourMinSec[2]+'s'+time.getMilliseconds()+'ms'+
+				(-1*time.getTimezoneOffset()/60)+'utc-'+
+				time.getTime()+'epoch');
+		}
+	};
 
 	function weAt(domain) {
 		domain = new RegExp( '\\/\\/[^\\/]*' + domain.replace(/\./,'\\.'), 'i' );
@@ -84,8 +92,7 @@
 	}
 
 	// **** DETAILS ****
-
-	var details = {
+	var DETAILS = {
 		before:'', middle:'', after:'', title:'',
 		monthNames: ['jan', 'feb', 'mar', 'apr', 'may', 'jun', 'jul', 'aug', 'sep', 'oct', 'nov', 'dec'],
 		dayNames: ['mon', 'tue', 'wed', 'thu', 'fri', 'sat', 'sun'],
@@ -103,7 +110,7 @@
 			} else if( weAt('youtube.com') ) {
 				this.set.author( $('.yt-user-info') );
 				var date = $('.watch-time-text').text().replace(/\*/g,'').replace(/Published on /,'')
-				this.middle = ' ('+this.dateReformat(date)+') ';
+				this.middle = ' ('+DATE.reformat(date)+') ';
 			} else if( weAt('news.ycombinator.com') ) {
 				var subtext = $('.subtext');
 				this.set.author( subtext.find('a:first') );
@@ -117,52 +124,49 @@
 				this.middle = ' '+points+'points ('+date+') ';
 			} else if( weAt('theatlantic.com') ) {
 				this.set.author( $('.metadata .authors') );
-				this.middle = ' ('+this.dateReformat( $('.metadata time').text() )+') ';
+				this.middle = ' ('+DATE.reformat( $('.metadata time').text() )+') ';
 				this.set.subtitle( $('.dek[itemprop=description]') );
 			} else if( weAt('medium.com') ) {
 				this.set.author( $('.metabar-block .avatar-span') );
-				this.middle = ' ('+ this.dateReformat( GLOBALS.embedded.post.virtuals.firstPublishedAtEnglish ) +') ';
+				this.middle = ' ('+ DATE.reformat( GLOBALS.embedded.post.virtuals.firstPublishedAtEnglish ) +') ';
 				this.set.subtitle( $('.section-content h4') );
 			} else if( weAt('blogspot') ) {
 				this.set.author( $('.profile-data a[rel=author]') );
 				var date = $('h2.date-header').text().trim();
-				this.middle = ' ('+this.dateReformat(date)+') ';
+				this.middle = ' ('+DATE.reformat(date)+') ';
 			} else if( weAt('ted.com') ) {
 				this.set.author( $('meta[name=author]') );
 				var date = $('.player-pip__meta .player-pip__meta__value:first').text().trim();
 				var duration = $('.player-pip__meta .player-pip__meta__value:last').text().trim().replace(/:/,'m')+'s';
-				this.middle = ' ('+this.dateReformat(date)+') '+duration+' ';
+				this.middle = ' ('+DATE.reformat(date)+') '+duration+' ';
 				this.set.subtitle( $('p.talk-description') );
+			} else if( weAt('elfinanciero.com.mx') ) {
+				this.set.author( $('.details-box span.important') );
+				var date = parseInt( $('.details-box .publishDate:first').attr('data-timestamp') * 1e3 );
+				this.middle = ' ('+DATE.notch( new Date(date) )+') ';
 			}
 		},
 		set:{
-			title:function() { details.title = document.title;
+			title:function() { DETAILS.title = document.title;
 				if( weAt('ted.com') ) {
-					details.title = details.title.replace(/^[^:]+\:\s*/,'').replace(/ \| TED.com$/,'').replace(/ \|[^|]*$/,'');
+					DETAILS.title = DETAILS.title.replace(/^[^:]+\:\s*/,'').replace(/ \| TED.com$/,'').replace(/ \|[^|]*$/,'');
 				}
-				details.title = '_'+ details.title.replace(/^Amazon\.com\s*\:\s*/,'').replace(/—/g,'-') +'_ ';
-				return details.title;
+				DETAILS.title = '_'+ DETAILS.title.replace(/^Amazon\.com\s*\:\s*/,'').replace(/—/g,'-') +'_ ';
+				return DETAILS.title;
 			},
 			author:function(author) {
-				details.before = (author.text() || author.attr('content')).trim()+' ';
+				DETAILS.before = (author.text() || author.attr('content')).trim()+' ';
 			},
 			subtitle:function(text) { text = text.text().trim();
-				text && (details.after = "\n\t__"+ text.replace(/_/g,'') +"__");
+				text && (DETAILS.after = "\n\t__"+ text.replace(/_/g,'') +"__");
 			}
-		},
-		dateReformat:function(date) { date = date.toLowerCase();
-			var day = (date.match(/\b\d{1,2}\b/)||[''])[0],
-				year = (date.match(/\b\d{4}\b/)||[''])[0],
-				dayName = (date.match( new RegExp('\\b('+this.dayNames.join('|')+')') )||[''])[0],
-				month = (date.match( new RegExp('\\b('+this.monthNames.join('|')+')') )||[''])[0];
-			return dayName+day+month+year;
 		},
 		economist:function($) {
 			var article = $('article[itemtype], #column-content');
 				article.remove('.source');
 			var date = article.find('.date-created, .dateline').text().trim();
 			if(date) {
-				date = '('+this.dateReformat( date )+') ';
+				date = '('+DATE.reformat( date )+') ';
 				this.middle = date;
 				var rubric = article.find('.rubric').text().trim();
 				if(rubric) {
@@ -180,7 +184,7 @@
 					date = info.find('.issued').text().trim().replace(/^[^:]*:\s*/,''),
 					isbn = info.find('.isbn').text().replace(/\D/g,'');
 				this.before = author+' ';
-				this.middle = this.dateReformat( date )+' ('+publisher+') isbn:'+isbn+' ';
+				this.middle = DATE.reformat( date )+' ('+publisher+') isbn:'+isbn+' ';
 			}
 		}
 	}
