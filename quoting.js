@@ -141,8 +141,8 @@
 				this.middle = ' ('+DATE.reformat(date)+') '+duration+' ';
 				this.set.subtitle( $('p.talk-description') );
 			} else if( weAt('elfinanciero.com.mx') ) {
-				this.set.author( $('.details-box span.important') );
-				var date = parseInt( $('.details-box .publishDate:first').attr('data-timestamp') * 1e3 );
+				this.set.author( $('.blog-author, .details-box span.important') );
+				var date = parseInt( $('.publishDate:first').attr('data-timestamp') * 1e3 );
 				this.middle = ' ('+DATE.notch( new Date(date) )+') ';
 			}
 		},
