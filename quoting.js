@@ -47,7 +47,7 @@
 			}
 		} else if( weAt('economist.com') ) {
 			var parse = url.match(/(https?:\/\/[^\/]+\/).*?\/.*?(\d{8,})/);
-			parse && (url = 'https://economist.com/node/' + parse[2]);
+			parse && (url = 'https://www.economist.com/node/' + parse[2]);
 		} else if( weAt('nytimes.com') ) {
 			url = $('.story-short-url a').text();
 		} else if( weAt('youtube.com') ) {
