@@ -1,6 +1,6 @@
 // Cite selected text by textile formatting it, properly indenting it, and embedding the website's metadata.
 // Keyboard Shortcut: alt-c
-// File name: to-textile.js
+// File name: quoting.js
 // URL: https://raw.githubusercontent.com/elzr/js-browserscripts/master/quoting.js
 //
 // First made into an independent file: 16 October 2012
@@ -127,7 +127,7 @@
 				this.middle = ' ('+DATE.reformat( $('.metadata time').text() )+') ';
 				this.set.subtitle( $('.dek[itemprop=description]') );
 			} else if( weAt('medium.com') ) {
-				this.set.author( $('.metabar-block .avatar-span') );
+				this.set.author( $('.metabar-block .avatar-span, .postMetaInline--authorDateline a') );
 				this.middle = ' ('+ DATE.reformat( GLOBALS.embedded.post.virtuals.firstPublishedAtEnglish ) +') ';
 				this.set.subtitle( $('.section-content h4') );
 			} else if( weAt('blogspot') ) {
@@ -156,7 +156,7 @@
 				return DETAILS.title;
 			},
 			author:function(author) {
-				DETAILS.before = (author.text() || author.attr('content')).trim()+' ';
+				DETAILS.before = (author.text() || author.attr('content') || '').trim()+' ';
 			},
 			subtitle:function(text) { text = text.text().trim();
 				text && (DETAILS.after = "\n\t__"+ text.replace(/_/g,'') +"__");
@@ -331,3 +331,4 @@
 		document.head.appendChild(style);
 	}
 })();
+
