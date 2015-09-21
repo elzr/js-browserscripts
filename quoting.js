@@ -17,7 +17,7 @@
 // 22aug2014: trying to trim the padding that occasionally gets on _ and *, also deleting that weird ­ character that sometimes gets between words
 // 26aug2014: further tweaking of padding to get it right
 // 10dec2014: more author & date extractions, for radar.oreilly.com, New Yorker, YouTube...
-// 11dec2015: reformatting for Hacker News & Reddit!
+// 11dec2014: reformatting for Hacker News & Reddit!
 
 (function () {
 	function parseQuote($) {

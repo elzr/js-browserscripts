@@ -7,6 +7,7 @@
 // BUGS:
 // there seems to be some weirdness after clicking Read More in a book's description that blocks the script with the msg:
 // "[CSM] Alert invocation detected with argument"
+// 21sep2015: Fixed Free App code
 
 (function () {
 	function cleanText(el) {
@@ -61,7 +62,7 @@
 			publisher = productDetails.find('li:contains(Publisher), li:contains(Verlag)').text().match(/: (.*)/),
 			shippingWeight = extractWeight( productDetails.find('li:contains(Shipping Weight), tr.size-weight td.value:first') ),
 			itemWeight = extractWeight( productDetails.find('li:contains(Item Weight)') ),
-			price = $('#combinedPriceBlock span.a-color-price:first, #tmmSwatches span.a-color-price:first').text().trim().replace(/\$([\d\.]+)/,"$1usd"),
+			price = $('#combinedPriceBlock span.a-color-price:first, #tmmSwatches span.a-button span.a-color-price:first').text().trim().replace(/\$([\d\.]+)/,"$1usd"),
 			url = location.toString();
 
 		publisher = publisher ? publisherProcess(publisher[1]) : '';
