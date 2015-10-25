@@ -128,7 +128,7 @@
 				this.set.subtitle( $('.dek[itemprop=description]') );
 			} else if( weAt('medium.com') ) {
 				this.set.author( $('.metabar-block .avatar-span, .postMetaInline--authorDateline a') );
-				this.middle = ' ('+ DATE.reformat( GLOBALS.embedded.post.virtuals.firstPublishedAtEnglish ) +') ';
+				//this.middle = ' ('+ DATE.reformat( GLOBALS.embedded.post.virtuals.firstPublishedAtEnglish ) +') ';
 				this.set.subtitle( $('.section-content h4') );
 			} else if( weAt('blogspot') ) {
 				this.set.author( $('.profile-data a[rel=author]') );
