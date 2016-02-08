@@ -131,7 +131,7 @@
 			} else if( weAt('medium.com') ) {
 				this.set.author( $('.postMetaHeader .postMetaInline-feedSummary a, .metabar-block .avatar-span, .postMetaInline--authorDateline a') );
 				//this.middle = ' ('+ DATE.reformat( GLOBALS.embedded.post.virtuals.firstPublishedAtEnglish ) +') ';
-				var date = $('span.postMetaInline--supplemental').text();
+				var date = $('span.postMetaInline--supplemental:first').text();
 				this.middle = ' ('+DATE.reformat(date)+') ';
 				this.set.subtitle( $('.section-content h4') );
 			} else if( weAt('blogspot') ) {
