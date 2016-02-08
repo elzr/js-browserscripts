@@ -45,6 +45,8 @@
 			if(parse && (parse.length >= 3)) {
 				url = 'https://amzn.com/' + parse[2];
 			}
+		} else if( weAt('medium.com') ) {
+			url = url.replace(/#[^#]*$/,'');
 		} else if( weAt('economist.com') ) {
 			var parse = url.match(/(https?:\/\/[^\/]+\/).*?\/.*?(\d{8,})/);
 			parse && (url = 'https://www.economist.com/node/' + parse[2]);
@@ -127,8 +129,10 @@
 				this.middle = ' ('+DATE.reformat( $('.metadata time').text() )+') ';
 				this.set.subtitle( $('.dek[itemprop=description]') );
 			} else if( weAt('medium.com') ) {
-				this.set.author( $('.metabar-block .avatar-span, .postMetaInline--authorDateline a') );
+				this.set.author( $('.postMetaHeader .postMetaInline-feedSummary a, .metabar-block .avatar-span, .postMetaInline--authorDateline a') );
 				//this.middle = ' ('+ DATE.reformat( GLOBALS.embedded.post.virtuals.firstPublishedAtEnglish ) +') ';
+				var date = $('span.postMetaInline--supplemental').text();
+				this.middle = ' ('+DATE.reformat(date)+') ';
 				this.set.subtitle( $('.section-content h4') );
 			} else if( weAt('blogspot') ) {
 				this.set.author( $('.profile-data a[rel=author]') );
@@ -294,6 +298,7 @@
 	function withJquery($) {
 		var css = ['::selection {background-color:#DC3855}'].join('\n');
 		loadStyle(css);
+
 		alert(parseQuote($));
 		reformat.boot($);
 	}
