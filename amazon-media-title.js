@@ -1,12 +1,11 @@
-// / ==UserScript==
+// ==UserScript==
 // @name Amazon Extractor
-// @namespace elzr
+// @namespace https://elzr.com/
 // @include https://*.amazon.com*
 // @version 0.1
 // @author Eli Parra
 // @grant none
-// ==/UserScript==
-//
+
 // Extract media details from Amazon (US & international).
 // File name: amazon-media-title.js
 // Keyboard Shortcut: alt-b
