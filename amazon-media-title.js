@@ -1,4 +1,4 @@
-// / ==UserScript==
+// ==UserScript==
 // @name Amazon Extractor
 // @namespace elzr
 // @include https://*.amazon.com*
