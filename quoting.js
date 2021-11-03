@@ -2,22 +2,28 @@
 // Keyboard Shortcut: alt-c
 // File name: quoting.js
 // URL: https://raw.githubusercontent.com/elzr/js-browserscripts/master/quoting.js
-//
-// First made into an independent file: 16 October 2012
-// 25jul2013: textile parse only once, better Amazon shortening
-// 29jul2013: epoch dating
-// 11sep2013: slight improvement to Amazon URL shortening
-// 11oct2013: fancy punctuation stripping
-// 14oct2013: punctuation tweaks
-// 10nov2013: fixed tabbing of +1 paragraphs
-// 29nov2013: Economist URL shortening
-// 28jul2014: closing single quote converted to double quote except for plurals
-// 8Aug2014: fixed Economist URl bug with blogs
-// 22aug2014: attempt to remove blank line between paragraphs
-// 22aug2014: trying to trim the padding that occasionally gets on _ and *, also deleting that weird ­ character that sometimes gets between words
-// 26aug2014: further tweaking of padding to get it right
-// 10dec2014: more author & date extractions, for radar.oreilly.com, New Yorker, YouTube...
+// 1ago2018: Added Quanta Magazine at ICM 2018
+// 25mar2018: Added proper date & author extraction from RibbonFarm
+// 1jan2018: Added subtitle to FT extraction
+// 25dec2017: made WeAt more strict because it was confusing cognitivemedium.com and medium.com
+// 22dec2017: improved copypaste, minor tweaks to FT.com & Medium (Hackernoon), deactivated single quote transform
+// 20dec2017: trimming ? params for all but YouTube, incredibly, direct copy/paste now works!
 // 11dec2014: reformatting for Hacker News & Reddit!
+// 10dec2014: more author & date extractions, for radar.oreilly.com, New Yorker, YouTube...
+// 26aug2014: further tweaking of padding to get it right
+// 22aug2014: trying to trim the padding that occasionally gets on _ and *, also deleting that weird ­ character that sometimes gets between words
+// 22aug2014: attempt to remove blank line between paragraphs
+// 8Aug2014: fixed Economist URl bug with blogs
+// 28jul2014: closing single quote converted to double quote except for plurals
+// 29nov2013: Economist URL shortening
+// 10nov2013: fixed tabbing of +1 paragraphs
+// 14oct2013: punctuation tweaks
+// 11oct2013: fancy punctuation stripping
+// 11sep2013: slight improvement to Amazon URL shortening
+// 29jul2013: epoch dating
+// 25jul2013: textile parse only once, better Amazon shortening
+// First made into an independent file: 16 October 2012
+
 
 (function () {
 	function parseQuote($) {
@@ -53,11 +59,15 @@
 		} else if( weAt('nytimes.com') ) {
 			url = $('.story-short-url a').text();
 		} else if( weAt('youtube.com') ) {
-			http://youtu.be/o6L6XeNdd_k
+			//http://youtu.be/o6L6XeNdd_k
 			var parse = url.match(/v=([^&]+)/);
 			if(parse && (parse.length == 2)) {
 				url = 'https://youtu.be/' + parse[1];
 			}
+		}
+		if( !weAt('youtube.com') ) { 
+			//parameters have become tracking noise 20dec2017
+			url = url.replace(/\?.*$/,'');
 		}
 		//console.log(url);
 		return url;
@@ -66,6 +76,13 @@
 	var DATE = {
 		monthNames: ['jan', 'feb', 'mar', 'apr', 'may', 'jun', 'jul', 'aug', 'sep', 'oct', 'nov', 'dec'],
 		dayNames: ['mon', 'tue', 'wed', 'thu', 'fri', 'sat', 'sun'],
+		intReformat:function(DateInInts) { //YYYY-MM-DD expected
+			var month = (DateInInts.match(/\b\d{1,2}\b\-/)||[''])[0],
+				day = (DateInInts.match(/\b\d{1,2}\b$/)||[''])[0],
+				year = (DateInInts.match(/\b\d{4}\b/)||[''])[0];
+			var monthName = DATE.monthNames[ parseInt(month) - 1];
+			return day+monthName+year;
+		},
 		reformat:function(date) { date = date.toLowerCase();
 			var day = (date.match(/\b\d{1,2}\b/)||[''])[0],
 				year = (date.match(/\b\d{4}\b/)||[''])[0],
@@ -91,7 +108,7 @@
 	};
 
 	function weAt(domain) {
-		domain = new RegExp( '\\/\\/[^\\/]*' + domain.replace(/\./,'\\.'), 'i' );
+		domain = new RegExp( '\\/\\/([^\\/]*\\.)?' + domain.replace(/\./,'\\.'), 'i' );
 		return location.toString().match( domain );
 	}
 
@@ -103,16 +120,20 @@
 			} else if( weAt('safaribooksonline.com') ) { this.safari($);
 			} else if( weAt('radar.oreilly.com') ) {
 				this.set.author( $('a[rel=author]') );
-				this.middle = ' ('+$('span.entry-date').text().trim()+') ';
+				this.middle = '('+$('span.entry-date').text().trim()+') ';
+			} else if( weAt('quantamagazine.org') ) {
+				this.set.author( $('.sidebar__author h3').first() );
+				var date = $('.post__sidebar__content .h6').first().text();
+				this.middle = '('+ DATE.reformat( date) +') ';
 			} else if( weAt('newyorker.com') ) {
 				this.set.author( $('a[rel=author]') );
 				var date = $('*[itemprop=datePublished]').attr('content').match(/\d+/g);
-				this.middle = ' ('+date[2]+DATE.monthNames[parseInt(date[1])-1]+date[0]+') ';
+				this.middle = '('+date[2]+DATE.monthNames[parseInt(date[1])-1]+date[0]+') ';
 				this.set.subtitle( $('#masthead h2') );
 			} else if( weAt('youtube.com') ) {
 				this.set.author( $('.yt-user-info') );
 				var date = $('.watch-time-text').text().replace(/\*/g,'').replace(/Published on /,'')
-				this.middle = ' ('+DATE.reformat(date)+') ';
+				this.middle = '('+DATE.reformat(date)+') ';
 			} else if( weAt('news.ycombinator.com') ) {
 				var subtext = $('.subtext');
 				this.set.author( subtext.find('a:first') );
@@ -126,29 +147,46 @@
 				this.middle = ' '+points+'points ('+date+') ';
 			} else if( weAt('theatlantic.com') ) {
 				this.set.author( $('.metadata .authors') );
-				this.middle = ' ('+DATE.reformat( $('.metadata time').text() )+') ';
+				this.middle = '('+DATE.reformat( $('.metadata time').text() )+') ';
 				this.set.subtitle( $('.dek[itemprop=description]') );
-			} else if( weAt('medium.com') ) {
-				this.set.author( $('.postMetaHeader .postMetaInline-feedSummary a, .metabar-block .avatar-span, .postMetaInline--authorDateline a') );
+			} else if( weAt('medium.com') || weAt('hackernoon.com') || weAt('magenta.as')  ) {
+				this.set.author( $('[data-action-source=post_header_lockup]:last, .postMetaLockup--authorWithBio a.ds-link.ds-link--styleSubtle, .postMetaHeader .postMetaInline-feedSummary a, .metabar-block .avatar-span, .postMetaInline--authorDateline a') );
 				//this.middle = ' ('+ DATE.reformat( GLOBALS.embedded.post.virtuals.firstPublishedAtEnglish ) +') ';
-				var date = $('span.postMetaInline--supplemental:first').text();
-				this.middle = ' ('+DATE.reformat(date)+') ';
+				var date = $('time:first').attr('datetime').replace(/T.*$/,'');
+				//var date = $('span.postMetaInline--supplemental:first').text();
+				this.middle = '('+ DATE.intReformat( date) +') ';
 				this.set.subtitle( $('.section-content h4') );
 			} else if( weAt('blogspot') ) {
 				this.set.author( $('.profile-data a[rel=author]') );
 				var date = $('h2.date-header').text().trim();
-				this.middle = ' ('+DATE.reformat(date)+') ';
+				this.middle = '('+DATE.reformat(date)+') ';
 			} else if( weAt('ted.com') ) {
 				this.set.author( $('meta[name=author]') );
 				$('.player-hero__meta__label').remove();
 				var date = $('.player-pip__meta .player-pip__meta__value:first, .player-hero__meta span:eq(1)').text().trim();
 				var duration = $('.player-pip__meta .player-pip__meta__value:last, .player-hero__meta span:eq(0)').text().trim().replace(/:/,'m')+'s';
-				this.middle = ' ('+DATE.reformat(date)+') '+duration+' ';
+				this.middle = '('+DATE.reformat(date)+') '+duration+' ';
 				this.set.subtitle( $('p.talk-description') );
 			} else if( weAt('elfinanciero.com.mx') ) {
 				this.set.author( $('.details-box span.important, .blog-author, .author-name').first() );
 				var date = parseInt( $('.publishDate:first').attr('data-timestamp') * 1e3 );
-				this.middle = ' ('+DATE.notch( new Date(date) )+') ';
+				this.middle = '('+DATE.notch( new Date(date) )+') ';
+			}  else if( weAt('aeon.co') ) {
+				this.set.author( $('span.article-card__authors__inner').first() );
+				var date = $('.article__date').text();
+				this.middle = '('+DATE.reformat(date)+') ';
+			}  else if( weAt('ft.com') ) {
+				this.set.author( $('.topper__columnist-name, .article-info__byline, .article__byline-tag') );
+				var date = $('.article__timestamp, .article-info__timestamp').attr('title');
+				this.middle = '('+DATE.reformat(date)+') ';
+				this.set.subtitle( $('.topper__standfirst') );
+			}  else if( weAt('stratechery.com') ) {
+				var date = $('time.entry-date.published').text();
+				this.middle = '('+DATE.reformat(date)+') ';
+			}  else if( weAt('ribbonfarm.com') ) {
+				var date = $('.date.published.time').text();
+				this.middle = '('+DATE.reformat(date)+') ';
+				this.set.author( $('.author.vcard') );
 			}
 		},
 		set:{
@@ -160,6 +198,7 @@
 				return DETAILS.title;
 			},
 			author:function(author) {
+				author = author.first();
 				DETAILS.before = (author.text() || author.attr('content') || '').trim()+' ';
 			},
 			subtitle:function(text) { text = text.text().trim();
@@ -167,13 +206,14 @@
 			}
 		},
 		economist:function($) {
-			var article = $('article[itemtype], #column-content');
+			var article = $('article[itemtype], #column-content').first();
 				article.remove('.source');
-			var date = article.find('.date-created, .dateline').text().trim();
+			var date = article.find('time[itemprop=dateCreated], .date-created, .dateline').text();
 			if(date) {
+				date = date.replace(/(\d\d)(th|st|nd|rd)/,'$1');
 				date = '('+DATE.reformat( date )+') ';
 				this.middle = date;
-				var rubric = article.find('.rubric').text().trim();
+				var rubric = article.find('.blog-post__rubric,.rubric').text().trim();
 				if(rubric) {
 					rubric = "\n\t__"+rubric+"__";
 					this.after = rubric;
@@ -234,7 +274,7 @@
 				replace(/“/g, '"'). //opening double quotes
 				replace(/”/g, '"'). //closing double quotes
 				//replace(/([^\w>]|^)‘/g, "$1\""). //opening single quote
-				replace(/([^s])’([^\w>]|$)/g, "$1\"$2"). //closing single quote converted to double quote except for plurals
+				//replace(/([^s])’([^\w>]|$)/g, "$1\"$2"). //closing single quote converted to double quote except for plurals
 				replace(/’|‘/g, "'"). //opening & closing single quotes
 				replace(/„/g, '"'). //lower opening double quotes
 				replace(/“/g, '"'). //lower closing double quotes
@@ -299,10 +339,23 @@
 		var css = ['::selection {background-color:#DC3855}'].join('\n');
 		loadStyle(css);
 
-		alert(parseQuote($));
+		var out = parseQuote($);
+		console.log( out );
+		//alert( out );
+		window.QUOTING = out;
+
+		document.addEventListener('copy', captureCopy);
+		document.execCommand('copy');
+
 		reformat.boot($);
 	}
 
+	function captureCopy(e) {
+		e.preventDefault();
+		e.clipboardData.setData('text/plain', window.QUOTING);
+		document.removeEventListener('copy', captureCopy);
+	}
+	
 	function loadJquery(callback) {
 		var script = document.createElement("script");
 		script.type = "text/javascript";
