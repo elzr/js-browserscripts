@@ -52,7 +52,7 @@
 	}
 	function getAuthors($) {
 		//clear up bothersome popups that mess up the copypaste
-		$('.a-popover-trigger, .a-popover-preload').remove(); 
+		$('.a-popover-trigger, .a-popover-preload').remove();
 		$('.a-declarative').removeAttr('data-action');
 		var authors = getExisting([ 'div#byline .author .a-link-normal', '.contributorNameTrigger', 'h1.parseasinTitle + a', 'h1.parseasinTitle + span > a']),
 			 contribs = getExisting([ 'div#byline .author .contribution', 'div#byline .author .a-link-normal + .contribution', 'h1.parseasinTitle + span > span.byLinePipe' ]);
@@ -79,7 +79,7 @@
 
 		url = shorten(url);
 
-		var extraction = (//(shippingWeight + itemWeight + 
+		var extraction = (//(shippingWeight + itemWeight +
 			price + authors +
 			' _'+title+'_ ' + pages + publisher + url+' '+dateNotch())
 		return extraction;
@@ -87,7 +87,7 @@
 
 	function dateNotch() {
 		//example 2013y9sep18wed-261d-14h44m04s539ms-5utc-1379533444539epoch
-		var now = new Date(), 
+		var now = new Date(),
 			dateWords = (now+'').toLowerCase().split(' '),
 			hourMinSec = dateWords[4].split(':')
 			start = new Date(now.getFullYear(), 0, 0),
@@ -117,7 +117,7 @@
 		}
 		return str;
 	};
-	
+
 	/* Script loading & running */
 	//---------------------------------------------
 	function withJquery(jQuery) {
